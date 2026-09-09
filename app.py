@@ -58,8 +58,51 @@ def eliminarhv(id):
     return {"mensaje": "Hoja de vida eliminada correctamente"}, 200
 
 #ACTUALIZAR HOJA DE VIDA POR ID
-@app.route("/api/actualizarhv/<int:id>", methods=["PUT"])
+@app.route("/api/actualizar_hoja_vida/<int:id>", methods=["PUT"])
+def actualizar_hoja_vida(id):
+    conexion = conectar_bd()
+    cursor = conexion.cursor()
+    datos = request.json
+    buscar_sql = "SELECT id_personal FROM Personal WHERE Correo = %s AND id_personal != %s"
+    cursor.execute(buscar_sql, (datos.get("correo"), id))
+    hoja_vida_existente = cursor.fetchone()
 
+    if hoja_vida_existente:
+        cursor.close()
+        conexion.close()
+        return {"mensaje": "El correo ya está registrado por otra hoja de vida"}, 400
+
+    sql = """
+        UPDATE Personal 
+        SET Fotografia = %s, Nombres = %s, Apellidos = %s, Correo = %s, Direccion = %s, Perfil_Profesional = %s 
+        WHERE id_personal = %s
+    """
+    valor = (
+        datos.get("foto"),
+        datos.get("nombres"),
+        datos.get("apellidos"),
+        datos.get("correo"),
+        datos.get("direccion"),
+        datos.get("perfil_profesional"),
+        id
+    )
+
+    cursor.execute(sql, valor)
+
+    if cursor.rowcount == 0:
+        cursor.close()
+        conexion.close()
+        return {"mensaje": "No se encontró la hoja de vida con el ID proporcionado"}, 404
+
+    conexion.commit()
+    cursor.close()
+    conexion.close()
+
+    return {
+        "mensaje": "Hoja de vida actualizada correctamente",
+        "id_personal": id
+    }
+    
 
 @app.route("/api/registrohv", methods=["POST"])
 def registrohojavida():
