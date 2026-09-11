@@ -314,6 +314,149 @@ def eliminar_estudio_por_id(id_estudio):
 
     return {"mensaje": "Estudio eliminado correctamente"}, 200
 
+# ==========================================
+# GESTIÓN DE EXPERIENCIA LABORAL
+# ==========================================
+
+# 1. Consultar las experiencias laborales de una hoja de vida
+@app.route("/api/consultarexperiencias/<int:id_personal>", methods=["GET"])
+def obtener_experiencias_hoja_vida(id_personal):
+    conexion = conectar_bd()
+    cursor = conexion.cursor(dictionary=True)
+
+    sql = "SELECT * FROM Experiencias WHERE id_personal = %s"
+    cursor.execute(sql, (id_personal,))
+    experiencias = cursor.fetchall()
+
+    cursor.close()
+    conexion.close()
+
+    return experiencias, 200
+
+
+# 2. Registrar una experiencia laboral
+@app.route("/api/registrarexperiencia/<int:id_personal>", methods=["POST"])
+def registrar_experiencia_hoja_vida(id_personal):
+    conexion = conectar_bd()
+    cursor = conexion.cursor()
+    datos = request.json
+
+    cursor.execute("SELECT id_personal FROM Personal WHERE id_personal = %s", (id_personal,))
+    if not cursor.fetchone():
+        cursor.close()
+        conexion.close()
+        return {"mensaje": "La hoja de vida especificada no existe"}, 404
+
+    sql = """
+        INSERT INTO Experiencias (id_personal, Empresa, Cargo, Area, Fecha_ingreso, Fecha_retiro, Funciones, Referencia_laboral, Certificado)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+    """
+    valores = (
+        id_personal,
+        datos.get("Empresa"),
+        datos.get("Cargo"),
+        datos.get("Area"),
+        datos.get("Fecha_ingreso"),
+        datos.get("Fecha_retiro"),
+        datos.get("Funciones"),
+        datos.get("Referencia_laboral"),
+        datos.get("Certificado")
+    )
+
+    cursor.execute(sql, valores)
+    conexion.commit()
+
+    id_experiencia = cursor.lastrowid
+
+    cursor.close()
+    conexion.close()
+
+    return {
+        "mensaje": "Experiencia laboral registrada correctamente",
+        "id_experiencia": id_experiencia
+    }, 201
+
+
+# 3. Consultar una experiencia específica
+@app.route("/api/consultarexperiencia/<int:id_experiencia>", methods=["GET"])
+def consultar_experiencia_por_id(id_experiencia):
+    conexion = conectar_bd()
+    cursor = conexion.cursor(dictionary=True)
+
+    sql = "SELECT * FROM Experiencias WHERE id_experiencia = %s"
+    cursor.execute(sql, (id_experiencia,))
+    experiencia = cursor.fetchone()
+
+    cursor.close()
+    conexion.close()
+
+    if not experiencia:
+        return {"mensaje": "Experiencia laboral no encontrada"}, 404
+
+    return experiencia, 200
+
+
+# 4. Actualizar una experiencia
+@app.route("/api/actualizarexperiencia/<int:id_experiencia>", methods=["PUT"])
+def actualizar_experiencia_por_id(id_experiencia):
+    conexion = conectar_bd()
+    cursor = conexion.cursor()
+    datos = request.json
+
+    sql = """
+        UPDATE Experiencias
+        SET Empresa = %s, Cargo = %s, Area = %s, Fecha_ingreso = %s, Fecha_retiro = %s, Funciones = %s, Referencia_laboral = %s, Certificado = %s
+        WHERE id_experiencia = %s
+    """
+    valores = (
+        datos.get("Empresa"),
+        datos.get("Cargo"),
+        datos.get("Area"),
+        datos.get("Fecha_ingreso"),
+        datos.get("Fecha_retiro"),
+        datos.get("Funciones"),
+        datos.get("Referencia_laboral"),
+        datos.get("Certificado"),
+        id_experiencia
+    )
+
+    cursor.execute(sql, valores)
+
+    if cursor.rowcount == 0:
+        cursor.close()
+        conexion.close()
+        return {"mensaje": "No se encontró la experiencia laboral para actualizar"}, 404
+
+    conexion.commit()
+    cursor.close()
+    conexion.close()
+
+    return {
+        "mensaje": "Experiencia laboral actualizada correctamente",
+        "id_experiencia": id_experiencia
+    }, 200
+
+
+# 5. Eliminar una experiencia
+@app.route("/api/eliminarexperiencia/<int:id_experiencia>", methods=["DELETE"])
+def eliminar_experiencia_por_id(id_experiencia):
+    conexion = conectar_bd()
+    cursor = conexion.cursor()
+
+    sql = "DELETE FROM Experiencias WHERE id_experiencia = %s"
+    cursor.execute(sql, (id_experiencia,))
+
+    if cursor.rowcount == 0:
+        cursor.close()
+        conexion.close()
+        return {"mensaje": "No se encontró la experiencia laboral para eliminar"}, 404
+
+    conexion.commit()
+    cursor.close()
+    conexion.close()
+
+    return {"mensaje": "Experiencia laboral eliminada correctamente"}, 200
+
 
 @app.route("/api/hoja-vida")
 def obtener_hojasvida():
