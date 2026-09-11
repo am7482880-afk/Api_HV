@@ -170,6 +170,54 @@ def obtener_hojasvidaid(id):
     return {
         "Mensaje": "Hoja de vida no encontrada"
     }
+@app.route("/api/hoja-vida")
+def obtener_hojasvida():
+    hojas_vida =[
+                {
+            "id_personal": 1,
+            "Fotografia": "foto1.jpg",
+            "Nombres": "Ana",
+            "Apellidos": "Muñoz",
+            "Correo": "nana@gmail.com",
+            "Direccion": "Calle 100 # 15-20",
+            "Perfil_Profesional": "Desarrollador Tecnólogo en ADSO con experiencia en Python y React"
+        },
+        {
+            "id_personal": 2,
+            "Fotografia": "foto2.jpg",
+            "Nombres": "Erik",
+            "Apellidos": "Espitia",
+            "Correo": "erik626@gmail.com",
+            "Direccion": "Carrera 7 # 45-10",
+            "Perfil_Profesional": "Diseñador y productor multimedia"
+        },
+        {
+            "id_personal": 3,
+            "Fotografia": "foto3.jpg",
+            "Nombres": "Sara",
+            "Apellidos": "Cely",
+            "Correo": "sara625@gmail.com",
+            "Direccion": "Carrera 7 # 45-10",
+            "Perfil_Profesional": "Animacion 3D"
+        }
+    ]
+    return hojas_vida
+
+# LISTAR TODAS LAS HOJAS DE VIDA REGISTRADAS EN BD
+@app.route("/api/listarhv")
+def listar_hojasvida():
+    conexion = conectar_bd()
+    cursor = conexion.cursor(dictionary=True)
+
+    sql = "SELECT * FROM personal"
+    cursor.execute(sql)
+
+    hojas_vida = cursor.fetchall()
+
+    cursor.close()
+    conexion.close()
+
+    return hojas_vida
 
 #CONSULTAR ESTUDIOS
 # Consultar todos los estudios asociados a una hoja de vida
@@ -692,57 +740,6 @@ def consultar_hoja_vida_completa(id_personal):
         "cursos": cursos,
         "experiencias_laborales": experiencias
     }, 200
-
-@app.route("/api/hoja-vida")
-def obtener_hojasvida():
-    hojas_vida =[
-                {
-            "id_personal": 1,
-            "Fotografia": "foto1.jpg",
-            "Nombres": "Ana",
-            "Apellidos": "Muñoz",
-            "Correo": "nana@gmail.com",
-            "Direccion": "Calle 100 # 15-20",
-            "Perfil_Profesional": "Desarrollador Tecnólogo en ADSO con experiencia en Python y React"
-        },
-        {
-            "id_personal": 2,
-            "Fotografia": "foto2.jpg",
-            "Nombres": "Erik",
-            "Apellidos": "Espitia",
-            "Correo": "erik626@gmail.com",
-            "Direccion": "Carrera 7 # 45-10",
-            "Perfil_Profesional": "Diseñador y productor multimedia"
-        },
-        {
-            "id_personal": 3,
-            "Fotografia": "foto3.jpg",
-            "Nombres": "Sara",
-            "Apellidos": "Cely",
-            "Correo": "sara625@gmail.com",
-            "Direccion": "Carrera 7 # 45-10",
-            "Perfil_Profesional": "Animacion 3D"
-        }
-    ]
-    return hojas_vida
-
-# -------------------------------------------------------------
-# LISTAR TODAS LAS HOJAS DE VIDA REGISTRADAS EN BD
-# -------------------------------------------------------------
-@app.route("/api/listarhv")
-def listar_hojasvida():
-    conexion = conectar_bd()
-    cursor = conexion.cursor(dictionary=True)
-
-    sql = "SELECT * FROM personal"
-    cursor.execute(sql)
-
-    hojas_vida = cursor.fetchall()
-
-    cursor.close()
-    conexion.close()
-
-    return hojas_vida
 
 
 if __name__ == "__main__":
