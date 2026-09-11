@@ -150,9 +150,7 @@ def registrohojavida():
         "id": id_generado
     }
 
-# -------------------------------------------------------------
 # OBTENER UNA HOJA DE VIDA DESDE LA BD POR ID
-# -------------------------------------------------------------
 @app.route("/api/hojas-vida/<int:id>")
 def obtener_hojasvidaid(id):
     conexion = conectar_bd()
@@ -175,9 +173,7 @@ def obtener_hojasvidaid(id):
         "Mensaje": "Hoja de vida no encontrada"
     }
 
-# ==========================================
 # GESTIÓN DE ESTUDIOS
-# ==========================================
 
 # 1. Consultar todos los estudios asociados a una hoja de vida
 @app.route("/api/consultarestudios/<int:id_personal>", methods=["GET"])
@@ -314,9 +310,7 @@ def eliminar_estudio_por_id(id_estudio):
 
     return {"mensaje": "Estudio eliminado correctamente"}, 200
 
-# ==========================================
 # GESTIÓN DE EXPERIENCIA LABORAL
-# ==========================================
 
 # 1. Consultar las experiencias laborales de una hoja de vida
 @app.route("/api/consultarexperiencias/<int:id_personal>", methods=["GET"])
@@ -334,7 +328,7 @@ def obtener_experiencias_hoja_vida(id_personal):
     return experiencias, 200
 
 
-# 2. Registrar una experiencia laboral
+# 2. Registrar una experiencia laboral (Incluyendo Habilidades)
 @app.route("/api/registrarexperiencia/<int:id_personal>", methods=["POST"])
 def registrar_experiencia_hoja_vida(id_personal):
     conexion = conectar_bd()
@@ -348,8 +342,8 @@ def registrar_experiencia_hoja_vida(id_personal):
         return {"mensaje": "La hoja de vida especificada no existe"}, 404
 
     sql = """
-        INSERT INTO Experiencias (id_personal, Empresa, Cargo, Area, Fecha_ingreso, Fecha_retiro, Funciones, Referencia_laboral, Certificado)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+        INSERT INTO Experiencias (id_personal, Empresa, Cargo, Area, Fecha_ingreso, Fecha_retiro, Funciones, Referencia_laboral, Certificado, Habilidades)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
     """
     valores = (
         id_personal,
@@ -360,7 +354,8 @@ def registrar_experiencia_hoja_vida(id_personal):
         datos.get("Fecha_retiro"),
         datos.get("Funciones"),
         datos.get("Referencia_laboral"),
-        datos.get("Certificado")
+        datos.get("Certificado"),
+        datos.get("Habilidades")
     )
 
     cursor.execute(sql, valores)
@@ -396,7 +391,7 @@ def consultar_experiencia_por_id(id_experiencia):
     return experiencia, 200
 
 
-# 4. Actualizar una experiencia
+# 4. Actualizar una experiencia (Incluyendo Habilidades)
 @app.route("/api/actualizarexperiencia/<int:id_experiencia>", methods=["PUT"])
 def actualizar_experiencia_por_id(id_experiencia):
     conexion = conectar_bd()
@@ -405,7 +400,7 @@ def actualizar_experiencia_por_id(id_experiencia):
 
     sql = """
         UPDATE Experiencias
-        SET Empresa = %s, Cargo = %s, Area = %s, Fecha_ingreso = %s, Fecha_retiro = %s, Funciones = %s, Referencia_laboral = %s, Certificado = %s
+        SET Empresa = %s, Cargo = %s, Area = %s, Fecha_ingreso = %s, Fecha_retiro = %s, Funciones = %s, Referencia_laboral = %s, Certificado = %s, Habilidades = %s
         WHERE id_experiencia = %s
     """
     valores = (
@@ -417,6 +412,7 @@ def actualizar_experiencia_por_id(id_experiencia):
         datos.get("Funciones"),
         datos.get("Referencia_laboral"),
         datos.get("Certificado"),
+        datos.get("Habilidades"),
         id_experiencia
     )
 
@@ -457,9 +453,7 @@ def eliminar_experiencia_por_id(id_experiencia):
 
     return {"mensaje": "Experiencia laboral eliminada correctamente"}, 200
 
-# ==========================================
 # GESTIÓN DE HABILIDADES EN EXPERIENCIAS
-# ==========================================
 
 # 1. Consultar las habilidades de una experiencia
 @app.route("/api/consultarhabilidades/<int:id_experiencia>", methods=["GET"])
@@ -549,6 +543,8 @@ def eliminar_habilidad_experiencia(id_experiencia):
     conexion.close()
 
     return {"mensaje": "Habilidades eliminadas de la experiencia correctamente"}, 200
+
+
 
 
 @app.route("/api/hoja-vida")
