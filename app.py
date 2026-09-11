@@ -175,6 +175,145 @@ def obtener_hojasvidaid(id):
         "Mensaje": "Hoja de vida no encontrada"
     }
 
+# ==========================================
+# GESTIÓN DE ESTUDIOS
+# ==========================================
+
+# 1. Consultar todos los estudios asociados a una hoja de vida
+@app.route("/api/consultarestudios/<int:id_personal>", methods=["GET"])
+def obtener_estudios_hoja_vida(id_personal):
+    conexion = conectar_bd()
+    cursor = conexion.cursor(dictionary=True)
+
+    sql = "SELECT * FROM Estudios WHERE id_personal = %s"
+    cursor.execute(sql, (id_personal,))
+    estudios = cursor.fetchall()
+
+    cursor.close()
+    conexion.close()
+
+    return estudios, 200
+
+
+# 2. Registrar un nuevo estudio para una hoja de vida
+@app.route("/api/registrarestudio/<int:id_personal>", methods=["POST"])
+def registrar_estudio_hoja_vida(id_personal):
+    conexion = conectar_bd()
+    cursor = conexion.cursor()
+    datos = request.json
+
+    cursor.execute("SELECT id_personal FROM Personal WHERE id_personal = %s", (id_personal,))
+    if not cursor.fetchone():
+        cursor.close()
+        conexion.close()
+        return {"mensaje": "La hoja de vida especificada no existe"}, 404
+
+    sql = """
+        INSERT INTO Estudios (id_personal, Nivel, Institucion, Titulo, Fecha_inicio, Fecha_finalizacion, Certificado)
+        VALUES (%s, %s, %s, %s, %s, %s, %s)
+    """
+    valores = (
+        id_personal,
+        datos.get("Nivel"),
+        datos.get("Institucion"),
+        datos.get("Titulo"),
+        datos.get("Fecha_inicio"),
+        datos.get("Fecha_finalizacion"),
+        datos.get("Certificado")
+    )
+
+    cursor.execute(sql, valores)
+    conexion.commit()
+
+    id_estudio = cursor.lastrowid
+
+    cursor.close()
+    conexion.close()
+
+    return {
+        "mensaje": "Estudio registrado correctamente",
+        "id_estudio": id_estudio
+    }, 201
+
+
+# 3. Consultar un estudio específico
+@app.route("/api/consultarestudio/<int:id_estudio>", methods=["GET"])
+def consultar_estudio_por_id(id_estudio):
+    conexion = conectar_bd()
+    cursor = conexion.cursor(dictionary=True)
+
+    sql = "SELECT * FROM Estudios WHERE id_estudio = %s"
+    cursor.execute(sql, (id_estudio,))
+    estudio = cursor.fetchone()
+
+    cursor.close()
+    conexion.close()
+
+    if not estudio:
+        return {"mensaje": "Estudio no encontrado"}, 404
+
+    return estudio, 200
+
+
+# 4. Actualizar un estudio
+@app.route("/api/actualizarestudio/<int:id_estudio>", methods=["PUT"])
+def actualizar_estudio_por_id(id_estudio):
+    conexion = conectar_bd()
+    cursor = conexion.cursor()
+    datos = request.json
+
+    sql = """
+        UPDATE Estudios
+        SET Nivel = %s, Institucion = %s, Titulo = %s, Fecha_inicio = %s, Fecha_finalizacion = %s, Certificado = %s
+        WHERE id_estudio = %s
+    """
+    valores = (
+        datos.get("Nivel"),
+        datos.get("Institucion"),
+        datos.get("Titulo"),
+        datos.get("Fecha_inicio"),
+        datos.get("Fecha_finalizacion"),
+        datos.get("Certificado"),
+        id_estudio
+    )
+
+    cursor.execute(sql, valores)
+
+    if cursor.rowcount == 0:
+        cursor.close()
+        conexion.close()
+        return {"mensaje": "No se encontró el estudio para actualizar"}, 404
+
+    conexion.commit()
+    cursor.close()
+    conexion.close()
+
+    return {
+        "mensaje": "Estudio actualizado correctamente",
+        "id_estudio": id_estudio
+    }, 200
+
+
+# 5. Eliminar un estudio
+@app.route("/api/eliminarestudio/<int:id_estudio>", methods=["DELETE"])
+def eliminar_estudio_por_id(id_estudio):
+    conexion = conectar_bd()
+    cursor = conexion.cursor()
+
+    sql = "DELETE FROM Estudios WHERE id_estudio = %s"
+    cursor.execute(sql, (id_estudio,))
+
+    if cursor.rowcount == 0:
+        cursor.close()
+        conexion.close()
+        return {"mensaje": "No se encontró el estudio para eliminar"}, 404
+
+    conexion.commit()
+    cursor.close()
+    conexion.close()
+
+    return {"mensaje": "Estudio eliminado correctamente"}, 200
+
 
 @app.route("/api/hoja-vida")
 def obtener_hojasvida():
