@@ -457,6 +457,99 @@ def eliminar_experiencia_por_id(id_experiencia):
 
     return {"mensaje": "Experiencia laboral eliminada correctamente"}, 200
 
+# ==========================================
+# GESTIÓN DE HABILIDADES EN EXPERIENCIAS
+# ==========================================
+
+# 1. Consultar las habilidades de una experiencia
+@app.route("/api/consultarhabilidades/<int:id_experiencia>", methods=["GET"])
+def obtener_habilidades_experiencia(id_experiencia):
+    conexion = conectar_bd()
+    cursor = conexion.cursor(dictionary=True)
+
+    sql = "SELECT id_experiencia, Habilidades FROM Experiencias WHERE id_experiencia = %s"
+    cursor.execute(sql, (id_experiencia,))
+    experiencia = cursor.fetchone()
+
+    cursor.close()
+    conexion.close()
+
+    if not experiencia:
+        return {"mensaje": "Experiencia laboral no encontrada"}, 404
+
+    return experiencia, 200
+
+
+# 2. Registrar / Asignar habilidades a una experiencia
+@app.route("/api/registrarhabilidad/<int:id_experiencia>", methods=["POST"])
+def registrar_habilidad_experiencia(id_experiencia):
+    conexion = conectar_bd()
+    cursor = conexion.cursor()
+    datos = request.json
+
+    sql = "UPDATE Experiencias SET Habilidades = %s WHERE id_experiencia = %s"
+    cursor.execute(sql, (datos.get("Habilidades"), id_experiencia))
+
+    if cursor.rowcount == 0:
+        cursor.close()
+        conexion.close()
+        return {"mensaje": "No se encontró la experiencia laboral"}, 404
+
+    conexion.commit()
+    cursor.close()
+    conexion.close()
+
+    return {
+        "mensaje": "Habilidad registrada correctamente",
+        "id_experiencia": id_experiencia
+    }, 200
+
+
+# 3. Actualizar la habilidad de una experiencia
+@app.route("/api/actualizarhabilidad/<int:id_experiencia>", methods=["PUT"])
+def actualizar_habilidad_experiencia(id_experiencia):
+    conexion = conectar_bd()
+    cursor = conexion.cursor()
+    datos = request.json
+
+    sql = "UPDATE Experiencias SET Habilidades = %s WHERE id_experiencia = %s"
+    cursor.execute(sql, (datos.get("Habilidades"), id_experiencia))
+
+    if cursor.rowcount == 0:
+        cursor.close()
+        conexion.close()
+        return {"mensaje": "No se encontró la experiencia para actualizar habilidades"}, 404
+
+    conexion.commit()
+    cursor.close()
+    conexion.close()
+
+    return {
+        "mensaje": "Habilidades actualizadas correctamente",
+        "id_experiencia": id_experiencia
+    }, 200
+
+
+# 4. Eliminar la habilidad de una experiencia (dejar el campo en NULL/vacío)
+@app.route("/api/eliminarhabilidad/<int:id_experiencia>", methods=["DELETE"])
+def eliminar_habilidad_experiencia(id_experiencia):
+    conexion = conectar_bd()
+    cursor = conexion.cursor()
+
+    sql = "UPDATE Experiencias SET Habilidades = NULL WHERE id_experiencia = %s"
+    cursor.execute(sql, (id_experiencia,))
+
+    if cursor.rowcount == 0:
+        cursor.close()
+        conexion.close()
+        return {"mensaje": "No se encontró la experiencia para eliminar habilidades"}, 404
+
+    conexion.commit()
+    cursor.close()
+    conexion.close()
+
+    return {"mensaje": "Habilidades eliminadas de la experiencia correctamente"}, 200
+
 
 @app.route("/api/hoja-vida")
 def obtener_hojasvida():
