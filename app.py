@@ -545,7 +545,117 @@ def eliminar_habilidad_experiencia(id_experiencia):
     return {"mensaje": "Habilidades eliminadas de la experiencia correctamente"}, 200
 
 
+# GESTIÓN DE CURSOS
 
+# 1. Consultar los cursos de una hoja de vida
+@app.route("/api/consultarcursos/<int:id_personal>", methods=["GET"])
+def obtener_cursos_hoja_vida(id_personal):
+    conexion = conectar_bd()
+    cursor = conexion.cursor(dictionary=True)
+
+    sql = "SELECT * FROM Cursos WHERE id_personal = %s"
+    cursor.execute(sql, (id_personal,))
+    cursos = cursor.fetchall()
+
+    cursor.close()
+    conexion.close()
+
+    return cursos, 200
+
+
+# 2. Registrar un curso
+@app.route("/api/registrarcurso/<int:id_personal>", methods=["POST"])
+def registrar_curso_hoja_vida(id_personal):
+    conexion = conectar_bd()
+    cursor = conexion.cursor()
+    datos = request.json
+
+    cursor.execute("SELECT id_personal FROM Personal WHERE id_personal = %s", (id_personal,))
+    if not cursor.fetchone():
+        cursor.close()
+        conexion.close()
+        return {"mensaje": "La hoja de vida especificada no existe"}, 404
+
+    sql = "INSERT INTO Cursos (id_personal, Nombre) VALUES (%s, %s)"
+    valores = (id_personal, datos.get("Nombre"))
+
+    cursor.execute(sql, valores)
+    conexion.commit()
+
+    id_curso = cursor.lastrowid
+
+    cursor.close()
+    conexion.close()
+
+    return {
+        "mensaje": "Curso registrado correctamente",
+        "id_curso": id_curso
+    }, 201
+
+
+# 3. Consultar un curso específico
+@app.route("/api/consultarcurso/<int:id_curso>", methods=["GET"])
+def consultar_curso_por_id(id_curso):
+    conexion = conectar_bd()
+    cursor = conexion.cursor(dictionary=True)
+
+    sql = "SELECT * FROM Cursos WHERE id_curso = %s"
+    cursor.execute(sql, (id_curso,))
+    curso = cursor.fetchone()
+
+    cursor.close()
+    conexion.close()
+
+    if not curso:
+        return {"mensaje": "Curso no encontrado"}, 404
+
+    return curso, 200
+
+
+# 4. Actualizar un curso
+@app.route("/api/actualizarcurso/<int:id_curso>", methods=["PUT"])
+def actualizar_curso_por_id(id_curso):
+    conexion = conectar_bd()
+    cursor = conexion.cursor()
+    datos = request.json
+
+    sql = "UPDATE Cursos SET Nombre = %s WHERE id_curso = %s"
+    cursor.execute(sql, (datos.get("Nombre"), id_curso))
+
+    if cursor.rowcount == 0:
+        cursor.close()
+        conexion.close()
+        return {"mensaje": "No se encontró el curso para actualizar"}, 404
+
+    conexion.commit()
+    cursor.close()
+    conexion.close()
+
+    return {
+        "mensaje": "Curso actualizado correctamente",
+        "id_curso": id_curso
+    }, 200
+
+
+# 5. Eliminar un curso
+@app.route("/api/eliminarcurso/<int:id_curso>", methods=["DELETE"])
+def eliminar_curso_por_id(id_curso):
+    conexion = conectar_bd()
+    cursor = conexion.cursor()
+
+    sql = "DELETE FROM Cursos WHERE id_curso = %s"
+    cursor.execute(sql, (id_curso,))
+
+    if cursor.rowcount == 0:
+        cursor.close()
+        conexion.close()
+        return {"mensaje": "No se encontró el curso para eliminar"}, 404
+
+    conexion.commit()
+    cursor.close()
+    conexion.close()
+
+    return {"mensaje": "Curso eliminado correctamente"}, 200
 
 @app.route("/api/hoja-vida")
 def obtener_hojasvida():
