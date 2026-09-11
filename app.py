@@ -122,7 +122,6 @@ def registrohojavida():
             "Mensaje": "El usuario ya existe"
         }
 
-    # Insertar en la tabla 'personal' con los campos exactos de tu BD
     sql = """
         INSERT INTO personal (Fotografia, Nombres, Apellidos, Correo, Direccion, Perfil_Profesional)
         VALUES (%s, %s, %s, %s, %s, %s)
@@ -139,7 +138,6 @@ def registrohojavida():
     cursor.execute(sql, valor)
     conexion.commit()
 
-    # Manejo del ID generado para la persona
     id_generado = cursor.lastrowid
 
     cursor.close()
@@ -173,9 +171,8 @@ def obtener_hojasvidaid(id):
         "Mensaje": "Hoja de vida no encontrada"
     }
 
-# GESTIÓN DE ESTUDIOS
-
-# 1. Consultar todos los estudios asociados a una hoja de vida
+#CONSULTAR ESTUDIOS
+# Consultar todos los estudios asociados a una hoja de vida
 @app.route("/api/consultarestudios/<int:id_personal>", methods=["GET"])
 def obtener_estudios_hoja_vida(id_personal):
     conexion = conectar_bd()
@@ -191,7 +188,7 @@ def obtener_estudios_hoja_vida(id_personal):
     return estudios, 200
 
 
-# 2. Registrar un nuevo estudio para una hoja de vida
+# Registrar un nuevo estudio para una hoja de vida
 @app.route("/api/registrarestudio/<int:id_personal>", methods=["POST"])
 def registrar_estudio_hoja_vida(id_personal):
     conexion = conectar_bd()
@@ -232,7 +229,7 @@ def registrar_estudio_hoja_vida(id_personal):
     }, 201
 
 
-# 3. Consultar un estudio específico
+# Consultar un estudio específico
 @app.route("/api/consultarestudio/<int:id_estudio>", methods=["GET"])
 def consultar_estudio_por_id(id_estudio):
     conexion = conectar_bd()
@@ -251,7 +248,7 @@ def consultar_estudio_por_id(id_estudio):
     return estudio, 200
 
 
-# 4. Actualizar un estudio
+# Actualizar un estudio
 @app.route("/api/actualizarestudio/<int:id_estudio>", methods=["PUT"])
 def actualizar_estudio_por_id(id_estudio):
     conexion = conectar_bd()
@@ -290,7 +287,7 @@ def actualizar_estudio_por_id(id_estudio):
     }, 200
 
 
-# 5. Eliminar un estudio
+# Eliminar un estudio
 @app.route("/api/eliminarestudio/<int:id_estudio>", methods=["DELETE"])
 def eliminar_estudio_por_id(id_estudio):
     conexion = conectar_bd()
@@ -312,7 +309,7 @@ def eliminar_estudio_por_id(id_estudio):
 
 # GESTIÓN DE EXPERIENCIA LABORAL
 
-# 1. Consultar las experiencias laborales de una hoja de vida
+# Consultar las experiencias laborales de una hoja de vida
 @app.route("/api/consultarexperiencias/<int:id_personal>", methods=["GET"])
 def obtener_experiencias_hoja_vida(id_personal):
     conexion = conectar_bd()
@@ -328,7 +325,7 @@ def obtener_experiencias_hoja_vida(id_personal):
     return experiencias, 200
 
 
-# 2. Registrar una experiencia laboral (Incluyendo Habilidades)
+# Registrar una experiencia laboral 
 @app.route("/api/registrarexperiencia/<int:id_personal>", methods=["POST"])
 def registrar_experiencia_hoja_vida(id_personal):
     conexion = conectar_bd()
@@ -372,7 +369,7 @@ def registrar_experiencia_hoja_vida(id_personal):
     }, 201
 
 
-# 3. Consultar una experiencia específica
+# Consultar una experiencia específica
 @app.route("/api/consultarexperiencia/<int:id_experiencia>", methods=["GET"])
 def consultar_experiencia_por_id(id_experiencia):
     conexion = conectar_bd()
@@ -391,7 +388,7 @@ def consultar_experiencia_por_id(id_experiencia):
     return experiencia, 200
 
 
-# 4. Actualizar una experiencia (Incluyendo Habilidades)
+# Actualizar una experiencia 
 @app.route("/api/actualizarexperiencia/<int:id_experiencia>", methods=["PUT"])
 def actualizar_experiencia_por_id(id_experiencia):
     conexion = conectar_bd()
@@ -433,7 +430,7 @@ def actualizar_experiencia_por_id(id_experiencia):
     }, 200
 
 
-# 5. Eliminar una experiencia
+# Eliminar una experiencia
 @app.route("/api/eliminarexperiencia/<int:id_experiencia>", methods=["DELETE"])
 def eliminar_experiencia_por_id(id_experiencia):
     conexion = conectar_bd()
@@ -453,9 +450,9 @@ def eliminar_experiencia_por_id(id_experiencia):
 
     return {"mensaje": "Experiencia laboral eliminada correctamente"}, 200
 
-# GESTIÓN DE HABILIDADES EN EXPERIENCIAS
+# GESTIÓN DE HABILIDADES 
 
-# 1. Consultar las habilidades de una experiencia
+# Consultar las habilidades de una experiencia
 @app.route("/api/consultarhabilidades/<int:id_experiencia>", methods=["GET"])
 def obtener_habilidades_experiencia(id_experiencia):
     conexion = conectar_bd()
@@ -474,7 +471,7 @@ def obtener_habilidades_experiencia(id_experiencia):
     return experiencia, 200
 
 
-# 2. Registrar / Asignar habilidades a una experiencia
+# Registrar / Asignar habilidades a una experiencia
 @app.route("/api/registrarhabilidad/<int:id_experiencia>", methods=["POST"])
 def registrar_habilidad_experiencia(id_experiencia):
     conexion = conectar_bd()
@@ -499,7 +496,7 @@ def registrar_habilidad_experiencia(id_experiencia):
     }, 200
 
 
-# 3. Actualizar la habilidad de una experiencia
+# Actualizar la habilidad de una experiencia
 @app.route("/api/actualizarhabilidad/<int:id_experiencia>", methods=["PUT"])
 def actualizar_habilidad_experiencia(id_experiencia):
     conexion = conectar_bd()
@@ -524,7 +521,7 @@ def actualizar_habilidad_experiencia(id_experiencia):
     }, 200
 
 
-# 4. Eliminar la habilidad de una experiencia (dejar el campo en NULL/vacío)
+# Eliminar la habilidad de una experiencia (dejar el campo en NULL/vacío)
 @app.route("/api/eliminarhabilidad/<int:id_experiencia>", methods=["DELETE"])
 def eliminar_habilidad_experiencia(id_experiencia):
     conexion = conectar_bd()
@@ -547,7 +544,7 @@ def eliminar_habilidad_experiencia(id_experiencia):
 
 # GESTIÓN DE CURSOS
 
-# 1. Consultar los cursos de una hoja de vida
+# Consultar los cursos de una hoja de vida
 @app.route("/api/consultarcursos/<int:id_personal>", methods=["GET"])
 def obtener_cursos_hoja_vida(id_personal):
     conexion = conectar_bd()
@@ -563,7 +560,7 @@ def obtener_cursos_hoja_vida(id_personal):
     return cursos, 200
 
 
-# 2. Registrar un curso
+# Registrar un curso
 @app.route("/api/registrarcurso/<int:id_personal>", methods=["POST"])
 def registrar_curso_hoja_vida(id_personal):
     conexion = conectar_bd()
@@ -593,7 +590,7 @@ def registrar_curso_hoja_vida(id_personal):
     }, 201
 
 
-# 3. Consultar un curso específico
+# Consultar un curso específico
 @app.route("/api/consultarcurso/<int:id_curso>", methods=["GET"])
 def consultar_curso_por_id(id_curso):
     conexion = conectar_bd()
@@ -612,7 +609,7 @@ def consultar_curso_por_id(id_curso):
     return curso, 200
 
 
-# 4. Actualizar un curso
+# Actualizar un curso
 @app.route("/api/actualizarcurso/<int:id_curso>", methods=["PUT"])
 def actualizar_curso_por_id(id_curso):
     conexion = conectar_bd()
@@ -637,7 +634,7 @@ def actualizar_curso_por_id(id_curso):
     }, 200
 
 
-# 5. Eliminar un curso
+# Eliminar un curso
 @app.route("/api/eliminarcurso/<int:id_curso>", methods=["DELETE"])
 def eliminar_curso_por_id(id_curso):
     conexion = conectar_bd()
@@ -656,6 +653,45 @@ def eliminar_curso_por_id(id_curso):
     conexion.close()
 
     return {"mensaje": "Curso eliminado correctamente"}, 200
+
+
+# CONSULTA COMPLETA DE LA HOJA DE VIDA
+
+@app.route("/api/consultarhojadevida/<int:id_personal>", methods=["GET"])
+def consultar_hoja_vida_completa(id_personal):
+    conexion = conectar_bd()
+    cursor = conexion.cursor(dictionary=True)
+
+    # Datos Personales
+    cursor.execute("SELECT * FROM Personal WHERE id_personal = %s", (id_personal,))
+    persona = cursor.fetchone()
+
+    if not persona:
+        cursor.close()
+        conexion.close()
+        return {"mensaje": "La hoja de vida especificada no existe"}, 404
+
+    # Información Académica 
+    cursor.execute("SELECT * FROM Estudios WHERE id_personal = %s", (id_personal,))
+    estudios = cursor.fetchall()
+
+    # Consultar Cursos
+    cursor.execute("SELECT * FROM Cursos WHERE id_personal = %s", (id_personal,))
+    cursos = cursor.fetchall()
+
+    # Consultar Experiencia Laboral 
+    cursor.execute("SELECT * FROM Experiencias WHERE id_personal = %s", (id_personal,))
+    experiencias = cursor.fetchall()
+
+    cursor.close()
+    conexion.close()
+
+    return {
+        "datos_personales": persona,
+        "estudios": estudios,
+        "cursos": cursos,
+        "experiencias_laborales": experiencias
+    }, 200
 
 @app.route("/api/hoja-vida")
 def obtener_hojasvida():
