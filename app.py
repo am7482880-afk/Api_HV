@@ -1,7 +1,8 @@
 from flask import Flask, request
 from database import conectar_bd
-
+from flask_cors import CORS
 app = Flask(__name__)
+CORS(app)
 
 
 @app.route("/")
@@ -35,6 +36,9 @@ def obtenerhv(id):
         return{"No se encontro hoja de vida"}
 
     return datos
+
+
+
 
 
 #ELIMINAR HOJA DE VIDA POR ID
@@ -78,7 +82,7 @@ def actualizar_hoja_vida(id):
         WHERE id_personal = %s
     """
     valor = (
-        datos.get("foto"),
+        datos.get("foto"), 
         datos.get("nombres"),
         datos.get("apellidos"),
         datos.get("correo"),
